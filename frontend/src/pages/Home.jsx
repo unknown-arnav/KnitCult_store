@@ -203,7 +203,9 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="space-y-3">
             <div className="flex items-center gap-2">
-              <div className="w-6 h-6 bg-white text-black font-black flex items-center justify-center text-xs">KC</div>
+              <div className="w-6 h-6 bg-white flex items-center justify-center overflow-hidden p-0.5">
+                <img src="/logo.svg" alt="KnitCult" className="w-full h-full object-contain" style={{ filter: "brightness(0)" }} />
+              </div>
               <span className="font-bold text-white uppercase tracking-widest">KnitCult</span>
             </div>
             <p className="text-zinc-500 leading-relaxed">
