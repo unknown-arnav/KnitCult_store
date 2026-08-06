@@ -1,0 +1,40 @@
+{
+  "project_name": "KITS & CULTURA - Minimalist Soccer Jersey Store",
+  "theme": "Minimalist Monochrome with warm neutrals (Black & White, avoid purple as requested)",
+  "typography": {
+    "heading_font": "Space Grotesk or Unbounded (Display / Mono)",
+    "body_font": "Inter / Geist Sans",
+    "weights": ["light", "regular", "medium", "bold", "black"]
+  },
+  "colors": {
+    "background": "#0D0D0D",
+    "surface": "#161616",
+    "card": "#1E1E1E",
+    "border": "#333333",
+    "text_primary": "#FFFFFF",
+    "text_secondary": "#A1A1AA",
+    "accent": "#E2E8F0",
+    "highlight": "#22C55E",
+    "forbidden_color": "#7351B7"
+  },
+  "features": [
+    "Authentication / Signin page with guest mode & simulated Web3/Email login",
+    "Minimalist Home page with hero editorial showcase and category switcher",
+    "Advanced search & filter (club, league, year, player editions)",
+    "Interactive product detail view with size selector, player printing customizer, and high-res zoom",
+    "Cart drawer & management with subtotal & shipping calculator",
+    "Multi-step checkout simulation with express payment and live order tracking"
+  ],
+  "image_urls": {
+    "hero_model": "https://images.unsplash.com/photo-1683142032379-a95b8af4fda5?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxODF8MHwxfHNlYXJjaHw0fHxmb290YmFsbCUyMHNvY2NlciUyMGplcnNleSUyMG1pbmltYWxpc3QlMjBtb2RlbHxlbnwwfHx8fDE3ODYwNTI2MDl8MA&ixlib=rb-4.1.0&q=85",
+    "jersey_flat": "https://images.unsplash.com/photo-1577212017184-80cc0da11082?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMzN8MHwxfHNlYXJjaHwxfHx2aW50YWdlJTIwZm9vdGJhbGwlMjBqZXJzZXklMjBhZXN0aGV0aWMlMjBwcm9kdWN0fGVufDB8fHx8MTc4NjA1MjYwOXww&ixlib=rb-4.1.0&q=85",
+    "jersey_model_back": "https://images.unsplash.com/photo-1759308553457-6f7f0850d9cd?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMzN8MHwxfHNlYXJjaHwzfHx2aW50YWdlJTIwZm9vdGJhbGwlMjBqZXJzZXklMjBhZXN0aGV0aWMlMjBwcm9kdWN0fGVufDB8fHx8MTc4NjA1MjYwOXww&ixlib=rb-4.1.0&q=85",
+    "stadium_bg": "https://images.unsplash.com/photo-1608154119029-53f3c6ad12e4?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMjh8MHwxfHNlYXJjaHwzfHxmb290YmFsbCUyMHN0YWRpdW0lMjBibGFjayUyMGFuZCUyMHdoaXRlJTIwbWluaW1hbGlzdHxlbnwwfHx8fDE3ODYwNTI2MDl8MA&ixlib=rb-4.1.0&q=85"
+  },
+  "universal_guidelines": [
+    "All interactive elements must include data-testid",
+    "No transparent backgrounds for headers/dropdowns",
+    "Generous spacing scale (Tailwind gap-6, p-8)",
+    "Strict adherence to monochrome & minimalist aesthetic"
+  ]
+}
