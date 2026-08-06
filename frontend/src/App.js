@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { StoreProvider } from "./context/StoreContext";
 import Navbar from "./components/Navbar";
 import CartDrawer from "./components/CartDrawer";
+import ScrollToTop from "./components/ScrollToTop";
 import Home from "./pages/Home";
 import Catalog from "./pages/Catalog";
 import ProductDetail from "./pages/ProductDetail";
@@ -16,6 +17,7 @@ function App() {
   return (
     <StoreProvider>
       <BrowserRouter>
+        <ScrollToTop />
         <div className="min-h-screen bg-[#0D0D0D] text-white flex flex-col selection:bg-white selection:text-black font-sans">
           <Navbar />
           <CartDrawer />
