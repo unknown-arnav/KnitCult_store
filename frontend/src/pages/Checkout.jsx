@@ -63,8 +63,8 @@ export default function Checkout() {
         {/* Checkout Header */}
         <div className="flex flex-col items-center justify-center text-center space-y-3 border-b border-[#222222] pb-8">
           <Link to="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-white flex items-center justify-center overflow-hidden p-0.5">
-              <img src="/logo.svg" alt="KnitCult" className="w-full h-full object-contain" style={{ filter: "brightness(0)" }} />
+            <div className="w-8 h-8 bg-black flex items-center justify-center overflow-hidden">
+              <img src="/logo.svg" alt="KnitCult" className="w-full h-full object-cover" style={{ filter: "brightness(0) invert(1)" }} />
             </div>
             <span className="font-bold uppercase tracking-widest text-sm">KnitCult Secure Checkout</span>
           </Link>

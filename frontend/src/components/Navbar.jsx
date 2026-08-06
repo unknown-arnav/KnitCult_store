@@ -17,12 +17,12 @@ export default function Navbar() {
         
         {/* Brand Logo */}
         <Link to="/" className="flex items-center gap-3 group" data-testid="brand-logo-link">
-          <div className="w-10 h-10 bg-white flex items-center justify-center rounded-none group-hover:scale-105 transition-transform overflow-hidden p-1">
+          <div className="w-10 h-10 bg-black flex items-center justify-center rounded-none group-hover:scale-105 transition-transform overflow-hidden">
             <img
               src="/logo.svg"
               alt="KnitCult"
-              className="w-full h-full object-contain"
-              style={{ filter: "brightness(0)" }}
+              className="w-full h-full object-cover"
+              style={{ filter: "brightness(0) invert(1)" }}
             />
           </div>
           <div className="flex flex-col">
