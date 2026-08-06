@@ -29,8 +29,13 @@ export default function Signin() {
         
         {/* Header */}
         <div className="text-center space-y-3">
-          <Link to="/" className="inline-flex w-12 h-12 bg-white text-black font-black items-center justify-center text-lg rounded-none mx-auto">
-            KC
+          <Link to="/" className="inline-flex w-20 h-20 items-center justify-center mx-auto">
+            <img
+              src="/logo.svg"
+              alt="KnitCult"
+              className="w-full h-full object-contain"
+              style={{ filter: "brightness(0) invert(1) contrast(1.4) drop-shadow(0 0 0.5px rgba(255,255,255,0.6))" }}
+            />
           </Link>
           <h2 className="text-2xl font-black uppercase tracking-tight">
             {user.isLoggedIn ? "Collector Account" : (isRegister ? "Create Archive Account" : "Sign In to Kits & Cultura")}
