@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { MOCK_JERSEYS } from "../mock";
 import { useStore } from "../context/StoreContext";
-import { Star, ShieldCheck, Truck, RotateCcw, Check, ShoppingBag, Plus, Minus, ArrowRight } from "lucide-react";
+import { Star, ShieldCheck, Truck, RotateCcw, Check, ShoppingBag, Plus, Minus, ArrowRight, History, X } from "lucide-react";
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -17,6 +17,7 @@ export default function ProductDetail() {
   const [quantity, setQuantity] = useState(1);
   const [activeImage, setActiveImage] = useState(jersey.image);
   const [addedToast, setAddedToast] = useState(false);
+  const [historyModalOpen, setHistoryModalOpen] = useState(false);
 
   const finalPlayerName = selectedPlayer === "CUSTOM NAME" ? (customInput ? customInput.toUpperCase() : "YOURNAME #99") : selectedPlayer;
 
@@ -91,9 +92,19 @@ export default function ProductDetail() {
               </div>
             </div>
 
-            <p className="text-sm text-zinc-300 font-light leading-relaxed">
-              {jersey.description}
-            </p>
+            <div className="space-y-4">
+              <p className="text-sm text-zinc-300 font-light leading-relaxed">
+                {jersey.description}
+              </p>
+
+              <button 
+                onClick={() => setHistoryModalOpen(true)}
+                className="w-full bg-zinc-900 border border-zinc-700 p-3 text-xs font-mono uppercase tracking-widest text-zinc-300 hover:text-white hover:border-white transition-colors flex items-center justify-center gap-2"
+                data-testid="open-history-modal-btn"
+              >
+                <History className="w-4 h-4 text-white" /> View Historical Campaign & Club Story
+              </button>
+            </div>
 
             {/* Size Selector */}
             <div className="space-y-3">
@@ -193,6 +204,42 @@ export default function ProductDetail() {
 
         </div>
       </div>
+
+      {/* Historical Campaign Modal */}
+      {historyModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm" data-testid="history-modal">
+          <div className="bg-[#141414] border border-zinc-700 max-w-lg w-full p-8 space-y-6 relative shadow-2xl">
+            <button 
+              onClick={() => setHistoryModalOpen(false)}
+              className="absolute top-4 right-4 text-zinc-400 hover:text-white"
+              data-testid="close-history-modal"
+            >
+              <X className="w-6 h-6" />
+            </button>
+
+            <div className="space-y-2">
+              <span className="text-xs font-mono text-zinc-400 uppercase tracking-widest">{jersey.club} • Campaign {jersey.year}</span>
+              <h3 className="text-xl font-black uppercase tracking-tight">{jersey.name}</h3>
+            </div>
+
+            <div className="space-y-4 text-xs font-mono text-zinc-300 leading-relaxed border-y border-zinc-800 py-4">
+              <p>
+                The <span className="text-white font-bold">{jersey.year}</span> season remains etched in football lore. Worn during dramatic European nights and domestic glory, this edition represents the pinnacle of club identity and heritage.
+              </p>
+              <p>
+                Meticulously reproduced with archival accuracy, featuring high-density embroidery, historical sponsor placements, and breathable match-spec weave.
+              </p>
+            </div>
+
+            <button 
+              onClick={() => setHistoryModalOpen(false)}
+              className="w-full bg-white text-black py-3 font-bold text-xs uppercase tracking-widest hover:bg-zinc-200 transition-colors"
+            >
+              Back to Configuration
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

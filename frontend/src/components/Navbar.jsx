@@ -36,6 +36,9 @@ export default function Navbar() {
           <Link to="/orders" className={`transition-colors hover:text-white ${location.pathname === '/orders' ? 'text-white border-b border-white pb-1' : 'text-zinc-400'}`} data-testid="nav-orders">
             Order Tracking
           </Link>
+          <Link to="/wishlist" className={`transition-colors hover:text-white ${location.pathname === '/wishlist' ? 'text-white border-b border-white pb-1' : 'text-zinc-400'}`} data-testid="nav-wishlist">
+            Wishlist
+          </Link>
         </nav>
 
         {/* Right Actions */}
@@ -77,6 +80,7 @@ export default function Navbar() {
           <Link to="/" onClick={() => setMobileMenuOpen(false)} className="block text-white font-medium">Home</Link>
           <Link to="/catalog" onClick={() => setMobileMenuOpen(false)} className="block text-zinc-300">Catalog & Search</Link>
           <Link to="/orders" onClick={() => setMobileMenuOpen(false)} className="block text-zinc-300">Order Tracking</Link>
+          <Link to="/wishlist" onClick={() => setMobileMenuOpen(false)} className="block text-zinc-300">Wishlist & Alerts</Link>
           <Link to="/signin" onClick={() => setMobileMenuOpen(false)} className="block text-zinc-300">Account / Sign In</Link>
         </div>
       )}
