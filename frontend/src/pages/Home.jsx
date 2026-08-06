@@ -24,10 +24,6 @@ export default function Home() {
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-36 flex flex-col items-start space-y-8">
           
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-zinc-900 border border-zinc-800 text-xs font-mono tracking-widest uppercase">
-            <Sparkles className="w-3.5 h-3.5 text-white" /> Archive Edition 2026
-          </div>
-
           <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tighter uppercase max-w-4xl leading-[1.05]">
             SACRED THREADS. <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-zinc-400 to-zinc-600">
