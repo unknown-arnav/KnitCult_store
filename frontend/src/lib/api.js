@@ -84,6 +84,8 @@ export const adminApi = {
   updateOrderStatus: (id, status) =>
     api.patch(`/admin/orders/${id}/status`, { status }).then((r) => r.data),
   refreshRecCache: () => api.post("/admin/cache/refresh").then((r) => r.data),
+  stats: () => api.get("/admin/stats/sales").then((r) => r.data),
+  statsDaily: (days = 14) => api.get("/admin/stats/sales/daily", { params: { days } }).then((r) => r.data),
 };
 
 // Convert backend product → jersey shape used by pages

@@ -1,8 +1,9 @@
 import re
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 
 from database import get_db
 from models import Product, Coupon, Order, User
@@ -258,3 +259,65 @@ def update_order_status(
 async def refresh_recommendation_cache(admin=Depends(require_admin)):
     count = await rec_engine.refresh_cache()
     return {"status": "cache refreshed", "products_cached": count}
+
+
+# ---------- Stats / Sales ----------
+def _revenue_between(db: Session, start: datetime | None) -> dict:
+    q = db.query(func.coalesce(func.sum(Order.total), 0.0), func.count(Order.id)).filter(
+        Order.payment_status == "paid"
+    )
+    if start is not None:
+        q = q.filter(Order.created_at >= start)
+    revenue, orders_count = q.one()
+    return {"revenue": float(revenue or 0), "orders": int(orders_count or 0)}
+
+
+@router.get("/stats/sales")
+def sales_stats(admin=Depends(require_admin), db: Session = Depends(get_db)):
+    now = datetime.now(timezone.utc)
+    start_today = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    start_week = start_today - timedelta(days=start_today.weekday())  # Monday of this week
+    start_month = start_today.replace(day=1)
+
+    total_orders = db.query(func.count(Order.id)).scalar() or 0
+    pending_orders = db.query(func.count(Order.id)).filter(Order.status.in_(["pending", "paid", "processing"])).scalar() or 0
+    in_transit = db.query(func.count(Order.id)).filter(Order.status == "in_transit").scalar() or 0
+    delivered = db.query(func.count(Order.id)).filter(Order.status == "delivered").scalar() or 0
+
+    return {
+        "today": _revenue_between(db, start_today),
+        "this_week": _revenue_between(db, start_week),
+        "this_month": _revenue_between(db, start_month),
+        "all_time": _revenue_between(db, None),
+        "orders": {
+            "total": int(total_orders),
+            "open": int(pending_orders),
+            "in_transit": int(in_transit),
+            "delivered": int(delivered),
+        },
+    }
+
+
+@router.get("/stats/sales/daily")
+def sales_daily(days: int = 14, admin=Depends(require_admin), db: Session = Depends(get_db)):
+    """Return a per-day series of revenue over the last `days` days for charting."""
+    days = max(1, min(days, 90))
+    now = datetime.now(timezone.utc)
+    start = (now - timedelta(days=days - 1)).replace(hour=0, minute=0, second=0, microsecond=0)
+    rows = (
+        db.query(
+            func.date(Order.created_at).label("d"),
+            func.coalesce(func.sum(Order.total), 0.0).label("revenue"),
+            func.count(Order.id).label("orders"),
+        )
+        .filter(Order.payment_status == "paid", Order.created_at >= start)
+        .group_by(func.date(Order.created_at))
+        .all()
+    )
+    by_date = {str(r.d): {"revenue": float(r.revenue), "orders": int(r.orders)} for r in rows}
+    series = []
+    for i in range(days):
+        d = (start + timedelta(days=i)).date().isoformat()
+        entry = by_date.get(d, {"revenue": 0.0, "orders": 0})
+        series.append({"date": d, **entry})
+    return {"series": series}
