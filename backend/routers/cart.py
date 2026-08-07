@@ -72,7 +72,19 @@ def add_to_cart(
         raise HTTPException(404, "Product not found")
     if body.qty <= 0:
         raise HTTPException(400, "Quantity must be positive")
+    # Validate size and stock
+    stock_map = p.stock or {}
+    if stock_map and body.size not in stock_map:
+        raise HTTPException(400, f"Size '{body.size}' not available. Available: {sorted(stock_map.keys())}")
     items = _read_cart(user.id)
+    current_qty = 0
+    for it in items:
+        if it["product_id"] == body.product_id and it["size"] == body.size:
+            current_qty = it["qty"]
+            break
+    available = stock_map.get(body.size, 0) if stock_map else 999
+    if current_qty + body.qty > available:
+        raise HTTPException(400, f"Only {available} in stock for size {body.size} (you already have {current_qty} in cart)")
     for it in items:
         if it["product_id"] == body.product_id and it["size"] == body.size:
             it["qty"] += body.qty

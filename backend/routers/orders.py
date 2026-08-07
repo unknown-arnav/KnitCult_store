@@ -70,9 +70,17 @@ async def place_order(
     subtotal = 0.0
     order_items: list[OrderItem] = []
     for it in body.items:
+        if it.qty <= 0:
+            raise HTTPException(400, "Item qty must be positive")
         p = db.query(Product).filter(Product.id == it.product_id, Product.is_active == True).first()  # noqa
         if not p:
             raise HTTPException(400, f"Product {it.product_id} not available")
+        stock_map = p.stock or {}
+        if stock_map and it.size not in stock_map:
+            raise HTTPException(400, f"Size '{it.size}' not available for {p.name}")
+        available = stock_map.get(it.size, 0) if stock_map else 999
+        if it.qty > available:
+            raise HTTPException(400, f"Only {available} of {p.name} size {it.size} in stock")
         line_total = p.price * it.qty
         subtotal += line_total
         order_items.append(
@@ -111,6 +119,14 @@ async def place_order(
     )
     order.items = order_items
     db.add(order)
+
+    # Decrement product stock
+    for it in body.items:
+        p = db.query(Product).filter(Product.id == it.product_id).first()
+        if p and p.stock:
+            new_stock = dict(p.stock)
+            new_stock[it.size] = max(0, int(new_stock.get(it.size, 0)) - int(it.qty))
+            p.stock = new_stock
 
     if coupon_obj:
         coupon_obj.used_count += 1

@@ -64,8 +64,8 @@ class ProductOut(BaseModel):
 
 
 class ProductAdminIn(BaseModel):
-    name: str
-    price: float
+    name: str = Field(min_length=1)
+    price: float = Field(ge=0)
     image: str = ""
     images: List[str] = []
     description: str = ""
@@ -96,14 +96,14 @@ class StockUpdateIn(BaseModel):
 # ---------- Cart ----------
 class CartAddIn(BaseModel):
     product_id: str
-    size: str = "M"
-    qty: int = 1
+    size: str = Field(default="M", min_length=1, max_length=10)
+    qty: int = Field(default=1, gt=0, le=100)
 
 
 class CartUpdateIn(BaseModel):
     product_id: str
-    size: str
-    qty: int
+    size: str = Field(min_length=1, max_length=10)
+    qty: int = Field(ge=0, le=100)
 
 
 class CartItemOut(BaseModel):
@@ -136,14 +136,14 @@ class CouponValidateOut(BaseModel):
 
 
 class CouponAdminIn(BaseModel):
-    code: str
+    code: str = Field(min_length=1)
     discount_type: str = "percent"
-    discount_value: float
+    discount_value: float = Field(gt=0)
     expiry_type: str = "time"
-    max_uses: Optional[int] = None
+    max_uses: Optional[int] = Field(default=None, ge=1)
     valid_from: Optional[datetime] = None
     valid_until: Optional[datetime] = None
-    min_order_value: float = 0
+    min_order_value: float = Field(default=0, ge=0)
     is_active: bool = True
 
 
@@ -164,13 +164,13 @@ class CouponOut(BaseModel):
 # ---------- Orders ----------
 class OrderItemIn(BaseModel):
     product_id: str
-    size: str = "M"
-    qty: int = 1
+    size: str = Field(default="M", min_length=1, max_length=10)
+    qty: int = Field(default=1, gt=0, le=100)
 
 
 class OrderPlaceIn(BaseModel):
-    items: List[OrderItemIn]
-    phone: str
+    items: List[OrderItemIn] = Field(min_length=1)
+    phone: str = Field(min_length=3)
     shipping_address: Dict[str, Any]
     coupon_code: Optional[str] = None
 

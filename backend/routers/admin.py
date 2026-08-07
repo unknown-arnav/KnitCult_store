@@ -169,6 +169,16 @@ def create_coupon(body: CouponAdminIn, admin=Depends(require_admin), db: Session
         raise HTTPException(400, "expiry_type must be 'count' or 'time'")
     if body.discount_type not in ("percent", "flat"):
         raise HTTPException(400, "discount_type must be 'percent' or 'flat'")
+    if body.discount_type == "percent" and not (0 < body.discount_value <= 100):
+        raise HTTPException(400, "Percent discount must be between 0 and 100")
+    if body.expiry_type == "count" and (body.max_uses is None or body.max_uses < 1):
+        raise HTTPException(400, "Count-based coupons require max_uses >= 1")
+    if body.expiry_type == "time":
+        if not body.valid_until:
+            raise HTTPException(400, "Time-based coupons require valid_until")
+        vu = body.valid_until.replace(tzinfo=timezone.utc) if body.valid_until.tzinfo is None else body.valid_until
+        if vu <= datetime.now(timezone.utc):
+            raise HTTPException(400, "valid_until must be in the future")
     c = Coupon(
         code=code,
         discount_type=body.discount_type,
