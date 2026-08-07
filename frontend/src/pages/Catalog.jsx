@@ -2,6 +2,7 @@ import React, { useState, useMemo } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { Search, Filter, Star, SlidersHorizontal, ArrowUpDown, X, Check } from "lucide-react";
 import { useStore } from "../context/StoreContext";
+import { matchesJersey } from "../lib/searchAliases";
 
 export default function Catalog() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -12,7 +13,7 @@ export default function Catalog() {
   const [selectedClub, setSelectedClub] = useState(searchParams.get("club") || "All Clubs");
   const [selectedYear, setSelectedYear] = useState(searchParams.get("era") || "All Eras");
   const [sortBy, setSortBy] = useState("popular");
-  const [maxPrice, setMaxPrice] = useState(500);
+  const [maxPrice, setMaxPrice] = useState(30000);
 
   const leagues = useMemo(() => ["All Leagues", ...Array.from(new Set(jerseys.map(j => j.league).filter(Boolean)))], [jerseys]);
   const clubs = useMemo(() => ["All Clubs", ...Array.from(new Set(jerseys.map(j => j.club).filter(Boolean)))], [jerseys]);
@@ -20,12 +21,7 @@ export default function Catalog() {
 
   const filteredJerseys = useMemo(() => {
     return jerseys.filter(jersey => {
-      const q = searchQuery.toLowerCase();
-      const matchesSearch = !q ||
-        jersey.name.toLowerCase().includes(q) ||
-        (jersey.club || "").toLowerCase().includes(q) ||
-        (jersey.player || "").toLowerCase().includes(q) ||
-        (jersey.description || "").toLowerCase().includes(q);
+      const matchesSearch = matchesJersey(jersey, searchQuery);
       
       const matchesLeague = selectedLeague === "All Leagues" || jersey.league === selectedLeague;
       const matchesClub = selectedClub === "All Clubs" || jersey.club === selectedClub;
@@ -47,7 +43,7 @@ export default function Catalog() {
     setSelectedLeague("All Leagues");
     setSelectedClub("All Clubs");
     setSelectedYear("All Eras");
-    setMaxPrice(500);
+    setMaxPrice(30000);
     setSearchParams({});
   };
 
@@ -66,7 +62,7 @@ export default function Catalog() {
             <Search className="absolute left-3.5 top-3.5 w-4 h-4 text-zinc-500" />
             <input 
               type="text" 
-              placeholder="Search club, player, year..." 
+              placeholder='Try "barca", "cr7", "invincibles", "istanbul" or a full club name...' 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full bg-[#161616] border border-zinc-800 pl-10 pr-4 py-3 text-xs text-white focus:outline-none focus:border-white font-mono"
@@ -126,13 +122,13 @@ export default function Catalog() {
           <div className="space-y-1">
             <div className="flex justify-between text-[10px] font-mono uppercase tracking-widest text-zinc-400">
               <span>Max Price</span>
-              <span className="text-white font-bold">${maxPrice}</span>
+              <span className="text-white font-bold">₹{maxPrice}</span>
             </div>
             <input 
               type="range" 
-              min="90" 
-              max="500" 
-              step="10"
+              min="1000" 
+              max="30000" 
+              step="500"
               value={maxPrice}
               onChange={(e) => setMaxPrice(Number(e.target.value))}
               className="w-full accent-white bg-zinc-800 h-2 mt-2"
@@ -161,7 +157,7 @@ export default function Catalog() {
         {/* Active Filters Bar & Count */}
         <div className="flex items-center justify-between text-xs font-mono text-zinc-400">
           <p>Showing <span className="text-white font-bold">{filteredJerseys.length}</span> archive jerseys</p>
-          {(selectedLeague !== "All Leagues" || selectedClub !== "All Clubs" || selectedYear !== "All Eras" || searchQuery !== "" || maxPrice < 500) && (
+          {(selectedLeague !== "All Leagues" || selectedClub !== "All Clubs" || selectedYear !== "All Eras" || searchQuery !== "" || maxPrice < 30000) && (
             <button 
               onClick={clearFilters}
               className="text-white underline hover:text-zinc-300 flex items-center gap-1"
@@ -241,7 +237,7 @@ export default function Catalog() {
                   </div>
 
                   <div className="p-5 pt-0 flex items-center justify-between border-t border-zinc-900 mt-4">
-                    <span className="text-base font-bold font-mono text-white">${jersey.price}</span>
+                    <span className="text-base font-bold font-mono text-white">₹{jersey.price}</span>
                     <Link 
                       to={`/product/${jersey.id}`}
                       className="bg-white text-black font-bold text-xs uppercase tracking-widest px-4 py-2.5 hover:bg-zinc-200 transition-colors"

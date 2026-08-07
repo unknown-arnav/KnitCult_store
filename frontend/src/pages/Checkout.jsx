@@ -34,7 +34,7 @@ export default function Checkout() {
 
   const subtotal = cart.reduce((s, i) => s + i.jersey.price * i.quantity, 0);
   const discount = couponInfo?.discount_amount || 0;
-  const shippingFee = subtotal >= 150 ? 0 : 15;
+  const shippingFee = subtotal >= 5000 ? 0 : 199;
   const total = Math.max(0, subtotal - discount) + (cart.length ? shippingFee : 0);
 
   const applyCoupon = async () => {
@@ -48,7 +48,7 @@ export default function Checkout() {
         setCouponInfo(null);
       } else {
         setCouponInfo(res);
-        toast.success(`${res.code} applied — saved $${res.discount_amount.toFixed(2)}`);
+        toast.success(`${res.code} applied — saved ₹${res.discount_amount.toFixed(2)}`);
       }
     } catch (e) {
       setCouponError("Failed to validate coupon");
@@ -143,7 +143,7 @@ export default function Checkout() {
               <div className="flex justify-between"><span>Ship to:</span><span className="text-white text-right">{address.name}, {address.city}</span></div>
               <div className="flex justify-between"><span>Phone:</span><span className="text-white">{confirmedOrder?.phone}</span></div>
               <div className="flex justify-between"><span>Payment:</span><span className="text-white">Mock success (PhonePe stub)</span></div>
-              <div className="flex justify-between text-sm font-bold pt-2 border-t border-zinc-800"><span>Total Paid:</span><span className="text-white">${confirmedOrder?.total.toFixed(2)}</span></div>
+              <div className="flex justify-between text-sm font-bold pt-2 border-t border-zinc-800"><span>Total Paid:</span><span className="text-white">₹{confirmedOrder?.total.toFixed(2)}</span></div>
             </div>
             <p className="text-xs font-mono text-zinc-400">A confirmation email has been sent to <span className="text-white">{user.email}</span></p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
@@ -235,7 +235,7 @@ export default function Checkout() {
                   </div>
 
                   <button type="submit" disabled={placing} className="w-full bg-white text-black py-4 font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-zinc-200 disabled:opacity-50 transition-colors shadow-2xl" data-testid="complete-order-btn">
-                    {placing ? <Loader2 className="w-4 h-4 animate-spin" /> : `Complete Secure Order • $${total.toFixed(2)}`}
+                    {placing ? <Loader2 className="w-4 h-4 animate-spin" /> : `Complete Secure Order • ₹${total.toFixed(2)}`}
                   </button>
                 </form>
               )}
@@ -252,7 +252,7 @@ export default function Checkout() {
                       <h4 className="text-xs font-bold text-white line-clamp-1">{item.jersey.name}</h4>
                       <p className="text-[10px] font-mono text-zinc-400">Size: {item.size} • Qty: {item.quantity}</p>
                     </div>
-                    <span className="text-xs font-mono font-bold text-white">${(item.jersey.price * item.quantity).toFixed(2)}</span>
+                    <span className="text-xs font-mono font-bold text-white">₹{(item.jersey.price * item.quantity).toFixed(2)}</span>
                   </div>
                 ))}
               </div>
@@ -270,10 +270,10 @@ export default function Checkout() {
               </div>
 
               <div className="space-y-2 text-xs font-mono text-zinc-400 pt-2 border-t border-zinc-800">
-                <div className="flex justify-between"><span>Subtotal</span><span className="text-white">${subtotal.toFixed(2)}</span></div>
+                <div className="flex justify-between"><span>Subtotal</span><span className="text-white">₹{subtotal.toFixed(2)}</span></div>
                 {discount > 0 && <div className="flex justify-between"><span>Discount</span><span className="text-green-400">-${discount.toFixed(2)}</span></div>}
-                <div className="flex justify-between"><span>Shipping</span><span className="text-white">{shippingFee === 0 ? 'FREE' : `$${shippingFee.toFixed(2)}`}</span></div>
-                <div className="flex justify-between text-sm font-bold text-white pt-3 border-t border-zinc-800"><span>Total Due</span><span className="font-mono text-base">${total.toFixed(2)}</span></div>
+                <div className="flex justify-between"><span>Shipping</span><span className="text-white">{shippingFee === 0 ? 'FREE' : `₹${shippingFee.toFixed(2)}`}</span></div>
+                <div className="flex justify-between text-sm font-bold text-white pt-3 border-t border-zinc-800"><span>Total Due</span><span className="font-mono text-base">₹{total.toFixed(2)}</span></div>
               </div>
             </div>
           </div>

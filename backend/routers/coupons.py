@@ -22,7 +22,7 @@ def _validate_coupon(coupon: Coupon | None, subtotal: float) -> tuple[bool, str,
         if coupon.max_uses is not None and coupon.used_count >= coupon.max_uses:
             return False, "Coupon has reached its usage limit", 0.0
     if subtotal < coupon.min_order_value:
-        return False, f"Minimum order of ${coupon.min_order_value:.2f} required", 0.0
+        return False, f"Minimum order of ₹{coupon.min_order_value:.2f} required", 0.0
     if coupon.discount_type == "percent":
         discount = subtotal * (coupon.discount_value / 100.0)
     else:

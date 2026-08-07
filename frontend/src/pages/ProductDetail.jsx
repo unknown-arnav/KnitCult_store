@@ -94,7 +94,7 @@ export default function ProductDetail() {
               <span className="text-xs font-mono text-zinc-400 uppercase tracking-widest">{jersey.club} Archive Replica</span>
               <h1 className="text-2xl sm:text-3xl font-black uppercase tracking-tight">{jersey.name}</h1>
               <div className="flex items-center justify-between pt-2">
-                <span className="text-2xl font-mono font-bold text-white">${jersey.price}</span>
+                <span className="text-2xl font-mono font-bold text-white">₹{jersey.price}</span>
                 <div className="flex items-center gap-1.5 text-xs font-mono text-zinc-300">
                   <Star className="w-4 h-4 fill-white text-white" />
                   <span className="font-bold">{jersey.rating}</span>
@@ -181,7 +181,7 @@ export default function ProductDetail() {
                   <div className="p-4 space-y-1">
                     <h3 className="font-bold text-sm text-white line-clamp-1 uppercase tracking-wide">{r.name}</h3>
                     <div className="flex items-center justify-between pt-1">
-                      <span className="font-mono text-sm text-white font-bold">${r.price}</span>
+                      <span className="font-mono text-sm text-white font-bold">₹{r.price}</span>
                       <span className="text-[10px] font-mono text-zinc-500">match {Math.round((r.score || 0) * 100)}%</span>
                     </div>
                   </div>

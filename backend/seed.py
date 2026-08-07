@@ -19,7 +19,7 @@ logging.basicConfig(level=logging.INFO)
 PRODUCTS = [
     {
         "name": "Arsenal 2003-04 Invincibles Home",
-        "price": 189.0,
+        "price": 16065.0,
         "image": "https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=800",
         "images": [
             "https://images.unsplash.com/photo-1522778119026-d647f0596c20?w=800",
@@ -39,7 +39,7 @@ PRODUCTS = [
     },
     {
         "name": "AC Milan 1989-90 Home",
-        "price": 219.0,
+        "price": 18615.0,
         "image": "https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=800",
         "images": ["https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=800"],
         "description": "The Gullit, van Basten, Rijkaard era — European Cup back-to-back champions.",
@@ -56,7 +56,7 @@ PRODUCTS = [
     },
     {
         "name": "Manchester United 1998-99 Treble Home",
-        "price": 249.0,
+        "price": 21165.0,
         "image": "https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=800",
         "images": ["https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=800"],
         "description": "The Treble-winning shirt — Premier League, FA Cup, Champions League.",
@@ -73,7 +73,7 @@ PRODUCTS = [
     },
     {
         "name": "Brazil 1970 World Cup Home",
-        "price": 279.0,
+        "price": 23715.0,
         "image": "https://images.unsplash.com/photo-1614632537190-23e4b2e69c88?w=800",
         "images": ["https://images.unsplash.com/photo-1614632537190-23e4b2e69c88?w=800"],
         "description": "Pelé's iconic canary yellow — arguably the greatest team ever assembled.",
@@ -90,7 +90,7 @@ PRODUCTS = [
     },
     {
         "name": "Liverpool 2005 Istanbul Home",
-        "price": 199.0,
+        "price": 16915.0,
         "image": "https://images.unsplash.com/photo-1517649763962-0c623066013b?w=800",
         "images": ["https://images.unsplash.com/photo-1517649763962-0c623066013b?w=800"],
         "description": "The Miracle of Istanbul. 3-0 down at half time. Champions of Europe by midnight.",
@@ -107,7 +107,7 @@ PRODUCTS = [
     },
     {
         "name": "Barcelona 2010-11 UCL Home",
-        "price": 229.0,
+        "price": 19465.0,
         "image": "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=800",
         "images": ["https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=800"],
         "description": "Pep's tiki-taka masterpiece. Wembley destruction of Manchester United.",
@@ -124,7 +124,7 @@ PRODUCTS = [
     },
     {
         "name": "Argentina 1986 World Cup Home",
-        "price": 259.0,
+        "price": 22015.0,
         "image": "https://images.unsplash.com/photo-1571019613914-85f342c1d4d1?w=800",
         "images": ["https://images.unsplash.com/photo-1571019613914-85f342c1d4d1?w=800"],
         "description": "Maradona's Mexico '86. The Hand of God. The Goal of the Century.",
@@ -141,7 +141,7 @@ PRODUCTS = [
     },
     {
         "name": "Juventus 1996 UCL Home",
-        "price": 209.0,
+        "price": 17765.0,
         "image": "https://images.unsplash.com/photo-1526676037777-05a232554d77?w=800",
         "images": ["https://images.unsplash.com/photo-1526676037777-05a232554d77?w=800"],
         "description": "Lippi's black-and-white kings — Del Piero, Zidane, Ronaldo era.",
@@ -239,17 +239,17 @@ def seed_coupons(db):
             expiry_type="time",
             valid_from=now,
             valid_until=now + timedelta(days=30),
-            min_order_value=200,
+            min_order_value=17000,
             is_active=True,
         ),
         Coupon(
             code="FLAT50",
             discount_type="flat",
-            discount_value=50,
+            discount_value=4250,
             expiry_type="time",
             valid_from=now,
             valid_until=now + timedelta(days=14),
-            min_order_value=250,
+            min_order_value=21250,
             is_active=True,
         ),
     ]
