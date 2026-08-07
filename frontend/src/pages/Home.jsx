@@ -237,6 +237,11 @@ export default function Home() {
             </div>
           </div>
         </div>
+
+        <div className="max-w-7xl mx-auto px-6 mt-12 pt-6 border-t border-[#1a1a1a] flex flex-col sm:flex-row items-center justify-between gap-3 text-[10px] font-mono uppercase tracking-widest text-zinc-500" data-testid="footer-credit">
+          <span>© {new Date().getFullYear()} KnitCult — All Rights Reserved</span>
+          <span className="text-zinc-400">Manifested into reality by <span className="text-white font-bold">Arnav</span></span>
+        </div>
       </footer>
 
     </div>

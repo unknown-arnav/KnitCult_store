@@ -61,13 +61,13 @@ export default function Navbar() {
           {/* Cart Trigger */}
           <button 
             onClick={() => setIsCartOpen(true)}
-            className="relative bg-white text-black px-4 py-2.5 font-bold text-xs uppercase tracking-widest flex items-center gap-2 hover:bg-zinc-200 transition-colors"
+            className="relative text-zinc-400 hover:text-white transition-colors p-2 flex items-center gap-2"
             data-testid="cart-drawer-trigger"
           >
-            <ShoppingBag className="w-4 h-4" />
-            <span className="hidden sm:inline">Bag</span>
+            <ShoppingBag className="w-5 h-5" />
+            <span className="text-xs hidden sm:inline font-mono">Bag</span>
             {totalCartItems > 0 && (
-              <span className="absolute -top-2 -right-2 bg-zinc-800 text-white font-mono text-[10px] w-5 h-5 rounded-full flex items-center justify-center border border-white">
+              <span className="absolute -top-1 -right-1 bg-white text-black font-mono text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-bold">
                 {totalCartItems}
               </span>
             )}
