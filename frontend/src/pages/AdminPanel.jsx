@@ -4,6 +4,7 @@ import { useStore } from "../context/StoreContext";
 import { adminApi } from "../lib/api";
 import { toast } from "sonner";
 import { Loader2, Plus, Trash2, Edit2, RefreshCw, Package, Tag, ShoppingCart, Save, X, LayoutDashboard, TrendingUp, DollarSign, Truck, Clock, CheckCircle2 } from "lucide-react";
+import Modal from "../components/Modal";
 
 const EMPTY_PRODUCT = {
   name: "",
@@ -121,10 +122,10 @@ function DashboardTab() {
   ];
 
   const orderCards = [
-    { label: "Total Orders", value: stats.orders.total, icon: ShoppingCart },
-    { label: "Open (pending/paid/processing)", value: stats.orders.open, icon: Clock },
-    { label: "In Transit", value: stats.orders.in_transit, icon: Truck },
-    { label: "Delivered", value: stats.orders.delivered, icon: CheckCircle2 },
+    { label: "Total Orders", value: stats.orders.total, icon: ShoppingCart, hint: "Every order ever placed" },
+    { label: "To Fulfill", value: stats.orders.open, icon: Clock, hint: "Pending payment · Paid · Processing" },
+    { label: "In Transit", value: stats.orders.in_transit, icon: Truck, hint: "Shipped, awaiting delivery" },
+    { label: "Delivered", value: stats.orders.delivered, icon: CheckCircle2, hint: "Reached the customer" },
   ];
 
   return (
@@ -184,12 +185,13 @@ function DashboardTab() {
         <span className="text-xs font-mono uppercase tracking-widest text-zinc-400 flex items-center gap-1 mb-4"><ShoppingCart className="w-3 h-3" /> Orders Received</span>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {orderCards.map((o) => (
-            <div key={o.label} className="bg-[#141414] border border-zinc-800 p-6 space-y-2" data-testid={`order-stat-${o.label.split(' ')[0].toLowerCase()}`}>
+            <div key={o.label} className="bg-[#141414] border border-zinc-800 p-6 space-y-2" data-testid={`order-stat-${o.label.replace(/\s+/g, "-").toLowerCase()}`}>
               <div className="flex items-center justify-between text-xs font-mono text-zinc-400 uppercase tracking-widest">
                 <span>{o.label}</span>
                 <o.icon className="w-4 h-4" />
               </div>
               <div className="text-3xl font-black font-mono text-white">{o.value}</div>
+              <div className="text-[10px] font-mono text-zinc-500">{o.hint}</div>
             </div>
           ))}
         </div>
@@ -343,6 +345,7 @@ function ProductsTab() {
 }
 
 function ProductForm({ initial, onSave, onCancel }) {
+  const isNew = !initial.id;
   const [f, setF] = useState({
     ...EMPTY_PRODUCT,
     ...initial,
@@ -362,17 +365,16 @@ function ProductForm({ initial, onSave, onCancel }) {
       if (r.size.trim()) stock[r.size.trim().toUpperCase()] = Number(r.qty) || 0;
     });
     const images = imagesText.split(/\n/).map((s) => s.trim()).filter(Boolean);
-    await onSave({ ...f, stock, images, price: Number(f.price) });
-    setSaving(false);
+    try {
+      await onSave({ ...f, stock, images, price: Number(f.price) });
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm overflow-y-auto">
-      <form onSubmit={submit} className="bg-[#141414] border border-zinc-700 max-w-3xl w-full p-8 space-y-5 my-8" data-testid="admin-product-form">
-        <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
-          <h3 className="text-lg font-black uppercase tracking-tight">{initial === EMPTY_PRODUCT ? "New Product" : `Edit: ${initial.name}`}</h3>
-          <button type="button" onClick={onCancel}><X className="w-5 h-5" /></button>
-        </div>
+    <Modal open={true} onClose={onCancel} title={isNew ? "New Product" : `Edit: ${initial.name}`} testId="admin-product-form" maxWidth="max-w-3xl">
+      <form onSubmit={submit} className="space-y-5">
         <div className="grid grid-cols-2 gap-4 text-xs font-mono">
           <Field label="Name" value={f.name} onChange={(v) => setF({ ...f, name: v })} required />
           <Field label="Price (USD)" type="number" value={f.price} onChange={(v) => setF({ ...f, price: v })} required />
@@ -419,10 +421,10 @@ function ProductForm({ initial, onSave, onCancel }) {
           <button type="submit" disabled={saving} className="bg-white text-black px-6 py-3 text-xs font-bold uppercase tracking-widest flex items-center gap-2 disabled:opacity-50" data-testid="admin-save-product-btn">
             {saving ? <Loader2 className="w-3 h-3 animate-spin" /> : <><Save className="w-3 h-3" /> Save Product</>}
           </button>
-          <button type="button" onClick={onCancel} className="border border-zinc-700 text-zinc-300 px-6 py-3 text-xs font-bold uppercase tracking-widest">Cancel</button>
+          <button type="button" onClick={onCancel} className="border border-zinc-700 text-zinc-300 px-6 py-3 text-xs font-bold uppercase tracking-widest" data-testid="admin-cancel-product-btn">Cancel</button>
         </div>
       </form>
-    </div>
+    </Modal>
   );
 }
 
@@ -665,24 +667,23 @@ function CouponUsageWidget({ coupon }) {
 }
 
 function CouponForm({ initial, onSave, onCancel }) {
+  const isNew = !initial.id;
   const [f, setF] = useState({ ...EMPTY_COUPON, ...initial });
   const [saving, setSaving] = useState(false);
 
   const submit = async (e) => {
     e.preventDefault();
     setSaving(true);
-    await onSave(f);
-    setSaving(false);
+    try {
+      await onSave(f);
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-      <form onSubmit={submit} className="bg-[#141414] border border-zinc-700 max-w-lg w-full p-8 space-y-5" data-testid="admin-coupon-form">
-        <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
-          <h3 className="text-lg font-black uppercase tracking-tight">{initial === EMPTY_COUPON ? "New Coupon" : `Edit: ${initial.code}`}</h3>
-          <button type="button" onClick={onCancel}><X className="w-5 h-5" /></button>
-        </div>
-
+    <Modal open={true} onClose={onCancel} title={isNew ? "New Coupon" : `Edit: ${initial.code}`} testId="admin-coupon-form" maxWidth="max-w-lg">
+      <form onSubmit={submit} className="space-y-5">
         <Field label="Code" value={f.code} onChange={(v) => setF({ ...f, code: v.toUpperCase() })} required />
 
         <div className="grid grid-cols-2 gap-4">
@@ -722,10 +723,10 @@ function CouponForm({ initial, onSave, onCancel }) {
           <button type="submit" disabled={saving} className="bg-white text-black px-6 py-3 text-xs font-bold uppercase tracking-widest flex items-center gap-2 disabled:opacity-50" data-testid="admin-save-coupon-btn">
             {saving ? <Loader2 className="w-3 h-3 animate-spin" /> : <><Save className="w-3 h-3" /> Save Coupon</>}
           </button>
-          <button type="button" onClick={onCancel} className="border border-zinc-700 text-zinc-300 px-6 py-3 text-xs font-bold uppercase tracking-widest">Cancel</button>
+          <button type="button" onClick={onCancel} className="border border-zinc-700 text-zinc-300 px-6 py-3 text-xs font-bold uppercase tracking-widest" data-testid="admin-cancel-coupon-btn">Cancel</button>
         </div>
       </form>
-    </div>
+    </Modal>
   );
 }
 
