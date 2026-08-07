@@ -1,0 +1,71 @@
+{
+  "summary": "Backend-only external-ingress testing completed. All 21 requested happy-path/auth/CRUD/integration checks passed, including Resend rejection tolerance, OTP attempt persistence and verification, Redis cart CRUD, order/payment flow, recommendations/cache refresh, admin CRUD, and role enforcement. Six defensive validation checks failed (21/27 overall passed).",
+  "backend_issues": {
+    "critical": [
+      {
+        "endpoint": "POST /api/orders",
+        "issue": "Accepts qty=0 and qty=-1, persists zero/negative-value orders, and returns 200; reproduced subtotal/total=-189.00 for qty=-1.",
+        "priority": "CRITICAL"
+      },
+      {
+        "endpoint": "POST /api/admin/products",
+        "issue": "Accepts and publishes products with negative prices (price=-10 returned 200).",
+        "priority": "HIGH"
+      },
+      {
+        "endpoint": "POST /api/cart/add",
+        "issue": "Does not enforce size stock; accepted qty=9 when M stock was 8, allowing overselling.",
+        "priority": "HIGH"
+      },
+      {
+        "endpoint": "POST /api/admin/coupons",
+        "issue": "Accepts invalid coupon rules: count expiry with max_uses=null (effectively never expires) and percent discount=150.",
+        "priority": "HIGH"
+      }
+    ],
+    "minor": [
+      {
+        "endpoint": "/api/auth/login and /api/auth/register",
+        "issue": "Password operations work, but backend logs repeatedly show passlib/bcrypt compatibility warning: bcrypt has no attribute __about__."
+      }
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/backend_test.py",
+    "/app/backend/tests/conftest.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [
+    "Constrain OrderItemIn.qty to >0 and revalidate in order placement before any DB write; also validate requested size and available stock.",
+    "Add positive/nonnegative Pydantic constraints for product price and stock values.",
+    "Add conditional coupon validation: count requires max_uses>0, time requires a future valid_until, percent must be within 0..100, and monetary values must be nonnegative.",
+    "Resolve the installed passlib/bcrypt API mismatch to remove runtime warnings.",
+    "Retest all 27 cases after fixes."
+  ],
+  "critical_code_review_comments": [
+    "schemas.py declares order qty, product price/stock, and coupon values as unconstrained primitives; admin.py only validates enum strings, causing all reproduced invalid-state defects.",
+    "orders.py calculates totals directly from unvalidated qty and commits them, so negative quantities become durable negative orders.",
+    "cart.py checks only qty>0 and product existence, but never validates size, per-size stock, or accumulated quantity against stock.",
+    "redis_client.py contains a hardcoded localhost fallback instead of failing fast when REDIS_URL is missing.",
+    "Several async routes perform synchronous SQLAlchemy/Redis operations on the event loop; use sync route functions or offload/migrate blocking I/O to avoid concurrency stalls."
+  ],
+  "updated_files": [
+    "/app/backend/tests/backend_test.py",
+    "/app/backend/tests/conftest.py",
+    "/app/test_reports/iteration_1.json"
+  ],
+  "success_rate": {
+    "backend": "78% (21/27; all requested happy paths passed)",
+    "frontend": "Not tested (backend-only request)"
+  },
+  "seed_data_creation": "Created temporary TEST_ users, orders, product, and coupons; all were cleaned directly after testing. Redis carts were cleared and FIRST10 used_count was restored to 0. Final checks: 8 active products, 0 TEST users/products/coupons.",
+  "should_call_test_agent_after_fix": true,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Run pytest /app/backend/tests/backend_test.py -n 0 -v --tb=short --junitxml=/app/test_reports/pytest/pytest_results.xml. Serial mode avoids the exact-8 catalog assertion racing with the admin product creation test. Resend rejected example.com recipients and the unverified knitcult.com sender as expected; register/order endpoints still returned 200 and completed. External URL came from frontend/.env.",
+  "rca_of_the_issue": "Missing schema and route-level commerce constraints are the common root cause. OrderItemIn.qty is a plain int; ProductAdminIn.price and stock values are unconstrained; CouponAdminIn has no bounds or cross-field validation; cart logic does not compare requested quantity to product.stock. Reproduction responses and failures are captured in pytest_results.xml."
+}

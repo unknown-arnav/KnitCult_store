@@ -44,13 +44,18 @@ export default function Navbar() {
           <Link to="/wishlist" className={`transition-colors hover:text-white ${location.pathname === '/wishlist' ? 'text-white border-b border-white pb-1' : 'text-zinc-400'}`} data-testid="nav-wishlist">
             Wishlist
           </Link>
+          {user?.role === "admin" && (
+            <Link to="/admin" className={`transition-colors hover:text-white ${location.pathname.startsWith('/admin') ? 'text-white border-b border-white pb-1' : 'text-zinc-400'}`} data-testid="nav-admin">
+              Admin
+            </Link>
+          )}
         </nav>
 
         {/* Right Actions */}
         <div className="flex items-center space-x-5">
           <Link to="/signin" className="text-zinc-400 hover:text-white transition-colors p-2 flex items-center gap-2" data-testid="user-account-btn">
             <User className="w-5 h-5" />
-            <span className="text-xs hidden lg:inline font-mono">{user.isLoggedIn ? user.name.split(" ")[0] : "Sign In"}</span>
+            <span className="text-xs hidden lg:inline font-mono">{user?.isLoggedIn ? ((user.name || user.email || "").split(" ")[0] || "Account") : "Sign In"}</span>
           </Link>
 
           {/* Cart Trigger */}

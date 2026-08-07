@@ -1,12 +1,11 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { useStore } from "../context/StoreContext";
-import { MOCK_JERSEYS } from "../mock";
 import { ArrowRight, ShieldCheck, Sparkles, Trophy, Star, ChevronRight, RefreshCw, Box } from "lucide-react";
 
 export default function Home() {
-  const { addToCart, toggleWishlist, wishlist } = useStore();
-  const trendingJerseys = MOCK_JERSEYS.filter(j => j.isTrending).slice(0, 4);
+  const { addToCart, toggleWishlist, wishlist, jerseys } = useStore();
+  const trendingJerseys = jerseys.filter(j => j.isTrending).slice(0, 4);
 
   return (
     <div className="min-h-screen bg-[#0D0D0D] text-white selection:bg-white selection:text-black">
@@ -89,10 +88,10 @@ export default function Home() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {[
-            { title: "Retro Centenary", desc: "1980s - 2000s Masterpieces", image: MOCK_JERSEYS[0].image, link: "/catalog?era=retro" },
-            { title: "Premier League", desc: "Invincibles & Title Winners", image: MOCK_JERSEYS[2].image, link: "/catalog?league=Premier+League" },
-            { title: "Serie A Icons", desc: "Calcio Golden Era Kits", image: MOCK_JERSEYS[1].image, link: "/catalog?league=Serie+A" },
-            { title: "International", desc: "World Cup Glory Editions", image: MOCK_JERSEYS[7].image, link: "/catalog?league=International" }
+            { title: "Retro Centenary", desc: "1980s - 2000s Masterpieces", image: jerseys[0]?.image || "", link: "/catalog?era=retro" },
+            { title: "Premier League", desc: "Invincibles & Title Winners", image: jerseys.find(j=>j.league==="Premier League")?.image || jerseys[0]?.image || "", link: "/catalog?league=Premier+League" },
+            { title: "Serie A Icons", desc: "Calcio Golden Era Kits", image: jerseys.find(j=>j.league==="Serie A")?.image || jerseys[1]?.image || "", link: "/catalog?league=Serie+A" },
+            { title: "International", desc: "World Cup Glory Editions", image: jerseys.find(j=>j.league==="International")?.image || jerseys[2]?.image || "", link: "/catalog?league=International" }
           ].map((cat, i) => (
             <Link 
               key={i} 

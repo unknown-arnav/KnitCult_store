@@ -1,26 +1,31 @@
 import React, { useState, useMemo } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { MOCK_JERSEYS, MOCK_LEAGUES, MOCK_CLUBS, MOCK_YEARS } from "../mock";
 import { Search, Filter, Star, SlidersHorizontal, ArrowUpDown, X, Check } from "lucide-react";
 import { useStore } from "../context/StoreContext";
 
 export default function Catalog() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const { toggleWishlist, wishlist } = useStore();
+  const { toggleWishlist, wishlist, jerseys, productsLoading } = useStore();
 
   const [searchQuery, setSearchQuery] = useState(searchParams.get("search") || "");
   const [selectedLeague, setSelectedLeague] = useState(searchParams.get("league") || "All Leagues");
   const [selectedClub, setSelectedClub] = useState(searchParams.get("club") || "All Clubs");
   const [selectedYear, setSelectedYear] = useState(searchParams.get("era") || "All Eras");
   const [sortBy, setSortBy] = useState("popular");
-  const [maxPrice, setMaxPrice] = useState(150);
+  const [maxPrice, setMaxPrice] = useState(500);
+
+  const leagues = useMemo(() => ["All Leagues", ...Array.from(new Set(jerseys.map(j => j.league).filter(Boolean)))], [jerseys]);
+  const clubs = useMemo(() => ["All Clubs", ...Array.from(new Set(jerseys.map(j => j.club).filter(Boolean)))], [jerseys]);
+  const years = useMemo(() => ["All Eras", ...Array.from(new Set(jerseys.map(j => j.year).filter(Boolean))).sort()], [jerseys]);
 
   const filteredJerseys = useMemo(() => {
-    return MOCK_JERSEYS.filter(jersey => {
-      const matchesSearch = 
-        jersey.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        jersey.club.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        jersey.description.toLowerCase().includes(searchQuery.toLowerCase());
+    return jerseys.filter(jersey => {
+      const q = searchQuery.toLowerCase();
+      const matchesSearch = !q ||
+        jersey.name.toLowerCase().includes(q) ||
+        (jersey.club || "").toLowerCase().includes(q) ||
+        (jersey.player || "").toLowerCase().includes(q) ||
+        (jersey.description || "").toLowerCase().includes(q);
       
       const matchesLeague = selectedLeague === "All Leagues" || jersey.league === selectedLeague;
       const matchesClub = selectedClub === "All Clubs" || jersey.club === selectedClub;
@@ -35,14 +40,14 @@ export default function Catalog() {
       if (sortBy === "rating") return b.rating - a.rating;
       return b.reviewsCount - a.reviewsCount; // popular
     });
-  }, [searchQuery, selectedLeague, selectedClub, selectedYear, maxPrice, sortBy, searchParams]);
+  }, [jerseys, searchQuery, selectedLeague, selectedClub, selectedYear, maxPrice, sortBy, searchParams]);
 
   const clearFilters = () => {
     setSearchQuery("");
     setSelectedLeague("All Leagues");
     setSelectedClub("All Clubs");
     setSelectedYear("All Eras");
-    setMaxPrice(150);
+    setMaxPrice(500);
     setSearchParams({});
   };
 
@@ -87,7 +92,7 @@ export default function Catalog() {
               className="w-full bg-zinc-900 border border-zinc-700 text-xs text-white p-2.5 font-mono focus:outline-none"
               data-testid="filter-league-select"
             >
-              {MOCK_LEAGUES.map(l => <option key={l} value={l}>{l}</option>)}
+              {leagues.map(l => <option key={l} value={l}>{l}</option>)}
             </select>
           </div>
 
@@ -100,7 +105,7 @@ export default function Catalog() {
               className="w-full bg-zinc-900 border border-zinc-700 text-xs text-white p-2.5 font-mono focus:outline-none"
               data-testid="filter-club-select"
             >
-              {MOCK_CLUBS.map(c => <option key={c} value={c}>{c}</option>)}
+              {clubs.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
           </div>
 
@@ -113,7 +118,7 @@ export default function Catalog() {
               className="w-full bg-zinc-900 border border-zinc-700 text-xs text-white p-2.5 font-mono focus:outline-none"
               data-testid="filter-year-select"
             >
-              {MOCK_YEARS.map(y => <option key={y} value={y}>{y}</option>)}
+              {years.map(y => <option key={y} value={y}>{y}</option>)}
             </select>
           </div>
 
@@ -126,8 +131,8 @@ export default function Catalog() {
             <input 
               type="range" 
               min="90" 
-              max="150" 
-              step="5"
+              max="500" 
+              step="10"
               value={maxPrice}
               onChange={(e) => setMaxPrice(Number(e.target.value))}
               className="w-full accent-white bg-zinc-800 h-2 mt-2"
@@ -156,7 +161,7 @@ export default function Catalog() {
         {/* Active Filters Bar & Count */}
         <div className="flex items-center justify-between text-xs font-mono text-zinc-400">
           <p>Showing <span className="text-white font-bold">{filteredJerseys.length}</span> archive jerseys</p>
-          {(selectedLeague !== "All Leagues" || selectedClub !== "All Clubs" || selectedYear !== "All Eras" || searchQuery !== "" || maxPrice < 150) && (
+          {(selectedLeague !== "All Leagues" || selectedClub !== "All Clubs" || selectedYear !== "All Eras" || searchQuery !== "" || maxPrice < 500) && (
             <button 
               onClick={clearFilters}
               className="text-white underline hover:text-zinc-300 flex items-center gap-1"

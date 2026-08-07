@@ -1,89 +1,81 @@
-from fastapi import FastAPI, APIRouter
-from dotenv import load_dotenv
-from starlette.middleware.cors import CORSMiddleware
-from motor.motor_asyncio import AsyncIOMotorClient
 import os
+import asyncio
 import logging
+from contextlib import asynccontextmanager
 from pathlib import Path
-from pydantic import BaseModel, Field, ConfigDict
-from typing import List
-import uuid
-from datetime import datetime, timezone
 
+from dotenv import load_dotenv
+from fastapi import FastAPI, APIRouter
+from starlette.middleware.cors import CORSMiddleware
 
 ROOT_DIR = Path(__file__).parent
-load_dotenv(ROOT_DIR / '.env')
+load_dotenv(ROOT_DIR / ".env")
 
-# MongoDB connection
-mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
+from database import Base, engine  # noqa: E402
+import recommendations as rec_engine  # noqa: E402
+from routers import auth as auth_router  # noqa: E402
+from routers import products as products_router  # noqa: E402
+from routers import cart as cart_router  # noqa: E402
+from routers import orders as orders_router  # noqa: E402
+from routers import coupons as coupons_router  # noqa: E402
+from routers import recommendations as recommendations_router  # noqa: E402
+from routers import payments as payments_router  # noqa: E402
+from routers import admin as admin_router  # noqa: E402
 
-# Create the main app without a prefix
-app = FastAPI()
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+)
+log = logging.getLogger("server")
 
-# Create a router with the /api prefix
-api_router = APIRouter(prefix="/api")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Ensure tables exist
+    Base.metadata.create_all(bind=engine)
+    # Initial recommendation cache load
+    try:
+        await rec_engine.refresh_cache()
+    except Exception as e:
+        log.error("Initial recommendation cache load failed: %s", e)
+    # Background refresh every 10 min
+    refresh_task = asyncio.create_task(rec_engine.periodic_refresh(600))
+    try:
+        yield
+    finally:
+        refresh_task.cancel()
 
 
-# Define Models
-class StatusCheck(BaseModel):
-    model_config = ConfigDict(extra="ignore")  # Ignore MongoDB's _id field
-    
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    client_name: str
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+app = FastAPI(title="KnitCult API", lifespan=lifespan)
 
-class StatusCheckCreate(BaseModel):
-    client_name: str
+# Legacy status router (kept for backwards compat with template healthcheck)
+legacy_router = APIRouter(prefix="/api")
 
-# Add your routes to the router instead of directly to app
-@api_router.get("/")
+
+@legacy_router.get("/")
 async def root():
-    return {"message": "Hello World"}
+    return {"service": "KnitCult", "status": "ok"}
 
-@api_router.post("/status", response_model=StatusCheck)
-async def create_status_check(input: StatusCheckCreate):
-    status_dict = input.model_dump()
-    status_obj = StatusCheck(**status_dict)
-    
-    # Convert to dict and serialize datetime to ISO string for MongoDB
-    doc = status_obj.model_dump()
-    doc['timestamp'] = doc['timestamp'].isoformat()
-    
-    _ = await db.status_checks.insert_one(doc)
-    return status_obj
 
-@api_router.get("/status", response_model=List[StatusCheck])
-async def get_status_checks():
-    # Exclude MongoDB's _id field from the query results
-    status_checks = await db.status_checks.find({}, {"_id": 0}).to_list(1000)
-    
-    # Convert ISO string timestamps back to datetime objects
-    for check in status_checks:
-        if isinstance(check['timestamp'], str):
-            check['timestamp'] = datetime.fromisoformat(check['timestamp'])
-    
-    return status_checks
+@legacy_router.get("/health")
+async def health():
+    return {"status": "ok"}
 
-# Include the router in the main app
-app.include_router(api_router)
+
+app.include_router(legacy_router)
+app.include_router(auth_router.router)
+app.include_router(products_router.router)
+app.include_router(cart_router.router)
+app.include_router(orders_router.router)
+app.include_router(coupons_router.router)
+app.include_router(recommendations_router.router)
+app.include_router(payments_router.router)
+app.include_router(admin_router.router)
 
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
-    allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
+    allow_origins=os.environ.get("CORS_ORIGINS", "*").split(","),
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
-
-@app.on_event("shutdown")
-async def shutdown_db_client():
-    client.close()

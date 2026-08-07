@@ -1,13 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { useStore } from "../context/StoreContext";
-import { MOCK_JERSEYS } from "../mock";
 import { Star, Trash2, ArrowRight, ShoppingBag } from "lucide-react";
 
 export default function Wishlist() {
-  const { wishlist, toggleWishlist, addToCart } = useStore();
+  const { wishlist, toggleWishlist, addToCart, jerseys } = useStore();
 
-  const wishlistedJerseys = MOCK_JERSEYS.filter(j => wishlist.includes(j.id));
+  const wishlistedJerseys = jerseys.filter(j => wishlist.includes(j.id));
 
   return (
     <div className="min-h-screen bg-[#0D0D0D] text-white py-12 px-4 sm:px-6 lg:px-8">
