@@ -228,6 +228,27 @@ def delete_coupon(coupon_id: str, admin=Depends(require_admin), db: Session = De
     return {"status": "deleted", "id": coupon_id}
 
 
+@router.post("/coupons/deactivate-expired")
+def deactivate_expired(admin=Depends(require_admin), db: Session = Depends(get_db)):
+    """Mark every expired or exhausted coupon as is_active=false in one call."""
+    now = datetime.now(timezone.utc)
+    active = db.query(Coupon).filter(Coupon.is_active == True).all()  # noqa
+    changed = []
+    for c in active:
+        expired = False
+        if c.expiry_type == "time" and c.valid_until:
+            vu = c.valid_until.replace(tzinfo=timezone.utc) if c.valid_until.tzinfo is None else c.valid_until
+            if vu < now:
+                expired = True
+        if c.expiry_type == "count" and c.max_uses is not None and c.used_count >= c.max_uses:
+            expired = True
+        if expired:
+            c.is_active = False
+            changed.append(c.code)
+    db.commit()
+    return {"deactivated": changed, "count": len(changed)}
+
+
 # ---------- Orders ----------
 @router.get("/orders", response_model=list[OrderOut])
 def list_all_orders(admin=Depends(require_admin), db: Session = Depends(get_db)):

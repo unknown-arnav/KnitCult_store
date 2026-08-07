@@ -445,16 +445,57 @@ function TextArea({ label, value, onChange, rows = 3 }) {
 }
 
 // ----------------- Coupons -----------------
+function isCouponExpired(c) {
+  if (c.expiry_type === "time" && c.valid_until) {
+    return new Date(c.valid_until) < new Date();
+  }
+  if (c.expiry_type === "count" && c.max_uses != null) {
+    return (c.used_count || 0) >= c.max_uses;
+  }
+  return false;
+}
+
 function CouponsTab() {
   const [coupons, setCoupons] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(null);
+  const [bulkDeactivating, setBulkDeactivating] = useState(false);
 
   const load = () => {
     setLoading(true);
     adminApi.listCoupons().then(setCoupons).finally(() => setLoading(false));
   };
   useEffect(load, []);
+
+  const expiredActive = coupons.filter((c) => c.is_active && isCouponExpired(c));
+
+  const bulkDeactivate = async () => {
+    if (expiredActive.length === 0) {
+      toast.info("Nothing to clean up");
+      return;
+    }
+    if (!window.confirm(`Deactivate ${expiredActive.length} expired coupon(s)?`)) return;
+    setBulkDeactivating(true);
+    try {
+      const res = await adminApi.deactivateExpiredCoupons();
+      toast.success(`Deactivated ${res.count} coupon${res.count === 1 ? "" : "s"}: ${res.deactivated.join(", ") || "none"}`);
+      load();
+    } catch (err) {
+      toast.error(err.response?.data?.detail || "Bulk deactivate failed");
+    } finally {
+      setBulkDeactivating(false);
+    }
+  };
+
+  const deactivateOne = async (c) => {
+    try {
+      await adminApi.updateCoupon(c.id, { ...c, is_active: false });
+      toast.success(`${c.code} deactivated`);
+      load();
+    } catch (err) {
+      toast.error(err.response?.data?.detail || "Failed to deactivate");
+    }
+  };
 
   const save = async (data) => {
     try {
@@ -487,11 +528,28 @@ function CouponsTab() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <p className="text-xs font-mono text-zinc-400">{coupons.length} coupons</p>
-        <button onClick={() => setEditing("new")} className="bg-white text-black text-xs font-bold uppercase tracking-widest px-4 py-2 flex items-center gap-2" data-testid="admin-new-coupon-btn">
-          <Plus className="w-3 h-3" /> New Coupon
-        </button>
+      <div className="flex justify-between items-center flex-wrap gap-3">
+        <p className="text-xs font-mono text-zinc-400">
+          {coupons.length} coupons
+          {expiredActive.length > 0 && (
+            <span className="ml-3 text-orange-400" data-testid="expired-count-badge">
+              ⚠ {expiredActive.length} expired / exhausted still active
+            </span>
+          )}
+        </p>
+        <div className="flex gap-3">
+          <button
+            onClick={bulkDeactivate}
+            disabled={bulkDeactivating || expiredActive.length === 0}
+            className="text-xs font-mono border border-orange-500 text-orange-400 px-4 py-2 hover:bg-orange-500/10 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2"
+            data-testid="admin-bulk-deactivate-btn"
+          >
+            {bulkDeactivating ? <Loader2 className="w-3 h-3 animate-spin" /> : <>⟲</>} Clean Up Expired ({expiredActive.length})
+          </button>
+          <button onClick={() => setEditing("new")} className="bg-white text-black text-xs font-bold uppercase tracking-widest px-4 py-2 flex items-center gap-2" data-testid="admin-new-coupon-btn">
+            <Plus className="w-3 h-3" /> New Coupon
+          </button>
+        </div>
       </div>
 
       {loading ? (
@@ -510,26 +568,46 @@ function CouponsTab() {
               </tr>
             </thead>
             <tbody>
-              {coupons.map((c) => (
-                <tr key={c.id} className="border-b border-zinc-900 hover:bg-[#161616]" data-testid={`admin-coupon-row-${c.id}`}>
-                  <td className="p-3 text-white font-bold">{c.code}</td>
-                  <td className="p-3 text-zinc-300">
-                    {c.discount_type === "percent" ? `${c.discount_value}%` : `$${c.discount_value}`}
-                    {c.min_order_value > 0 && <span className="text-zinc-500"> (min ${c.min_order_value})</span>}
-                  </td>
-                  <td className="p-3 text-zinc-300">
-                    {c.expiry_type === "count" ? `Count: ${c.max_uses ?? "∞"}` : `Until: ${c.valid_until ? new Date(c.valid_until).toLocaleDateString() : "—"}`}
-                  </td>
-                  <td className="p-3 text-right">
-                    <CouponUsageWidget coupon={c} />
-                  </td>
-                  <td className="p-3 text-center">{c.is_active ? "✓" : "✗"}</td>
-                  <td className="p-3 text-right space-x-2">
-                    <button onClick={() => setEditing(c)} className="text-white hover:underline" data-testid={`admin-edit-coupon-${c.id}`}><Edit2 className="w-3.5 h-3.5 inline" /></button>
-                    <button onClick={() => remove(c)} className="text-red-400 hover:underline" data-testid={`admin-delete-coupon-${c.id}`}><Trash2 className="w-3.5 h-3.5 inline" /></button>
-                  </td>
-                </tr>
-              ))}
+              {coupons.map((c) => {
+                const expired = isCouponExpired(c);
+                const rowClass = expired && c.is_active
+                  ? "bg-red-950/30 border-b border-red-900/50"
+                  : "border-b border-zinc-900 hover:bg-[#161616]";
+                return (
+                  <tr key={c.id} className={rowClass} data-testid={`admin-coupon-row-${c.id}`}>
+                    <td className="p-3 text-white font-bold">
+                      <div className="flex items-center gap-2">
+                        {c.code}
+                        {expired && (
+                          <span className="text-[9px] font-mono uppercase tracking-widest px-1.5 py-0.5 border border-red-500 text-red-400" data-testid={`coupon-expired-badge-${c.id}`}>
+                            Expired
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="p-3 text-zinc-300">
+                      {c.discount_type === "percent" ? `${c.discount_value}%` : `$${c.discount_value}`}
+                      {c.min_order_value > 0 && <span className="text-zinc-500"> (min ${c.min_order_value})</span>}
+                    </td>
+                    <td className="p-3 text-zinc-300">
+                      {c.expiry_type === "count" ? `Count: ${c.max_uses ?? "∞"}` : `Until: ${c.valid_until ? new Date(c.valid_until).toLocaleDateString() : "—"}`}
+                    </td>
+                    <td className="p-3 text-right">
+                      <CouponUsageWidget coupon={c} />
+                    </td>
+                    <td className="p-3 text-center">{c.is_active ? "✓" : "✗"}</td>
+                    <td className="p-3 text-right whitespace-nowrap space-x-2">
+                      {expired && c.is_active && (
+                        <button onClick={() => deactivateOne(c)} className="text-orange-400 hover:underline text-[10px] font-mono uppercase tracking-widest" data-testid={`admin-deactivate-coupon-${c.id}`}>
+                          Deactivate
+                        </button>
+                      )}
+                      <button onClick={() => setEditing(c)} className="text-white hover:underline" data-testid={`admin-edit-coupon-${c.id}`}><Edit2 className="w-3.5 h-3.5 inline" /></button>
+                      <button onClick={() => remove(c)} className="text-red-400 hover:underline" data-testid={`admin-delete-coupon-${c.id}`}><Trash2 className="w-3.5 h-3.5 inline" /></button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

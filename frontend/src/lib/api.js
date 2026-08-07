@@ -80,6 +80,7 @@ export const adminApi = {
   createCoupon: (data) => api.post("/admin/coupons", data).then((r) => r.data),
   updateCoupon: (id, data) => api.put(`/admin/coupons/${id}`, data).then((r) => r.data),
   deleteCoupon: (id) => api.delete(`/admin/coupons/${id}`).then((r) => r.data),
+  deactivateExpiredCoupons: () => api.post("/admin/coupons/deactivate-expired").then((r) => r.data),
   listOrders: () => api.get("/admin/orders").then((r) => r.data),
   updateOrderStatus: (id, status) =>
     api.patch(`/admin/orders/${id}/status`, { status }).then((r) => r.data),
