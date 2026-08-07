@@ -89,7 +89,7 @@ export default function Orders() {
                     </div>
                     <p className="text-xs font-mono text-zinc-400">Placed on {new Date(ord.created_at).toLocaleDateString()}</p>
                   </div>
-                  <span className="text-lg font-mono font-bold text-white">${ord.total.toFixed(2)}</span>
+                  <span className="text-lg font-mono font-bold text-white">₹{ord.total.toFixed(2)}</span>
                 </div>
 
                 <div className="space-y-3">
@@ -102,7 +102,7 @@ export default function Orders() {
                           <p className="font-bold text-white">{item.product_name}</p>
                           <p className="text-zinc-400 text-[10px]">Size: {item.size} • Qty: {item.qty} • ${item.price_at_purchase.toFixed(2)} each</p>
                         </div>
-                        <span className="text-white font-bold">${(item.price_at_purchase * item.qty).toFixed(2)}</span>
+                        <span className="text-white font-bold">₹{(item.price_at_purchase * item.qty).toFixed(2)}</span>
                       </div>
                     ))}
                   </div>

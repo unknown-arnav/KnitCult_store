@@ -58,8 +58,8 @@ export default function Home() {
               <p className="tracking-wider uppercase">Match Spec Detail</p>
             </div>
             <div>
-              <p className="text-white text-lg font-bold font-sans">Free Global</p>
-              <p className="tracking-wider uppercase">Shipping Over $150</p>
+              <p className="text-white text-lg font-bold font-sans">Pan-India</p>
+              <p className="tracking-wider uppercase">Free Shipping Over ₹5000</p>
             </div>
             <div>
               <p className="text-white text-lg font-bold font-sans">Custom Name</p>
@@ -171,7 +171,7 @@ export default function Home() {
                 </div>
 
                 <div className="p-5 pt-0 flex items-center justify-between border-t border-zinc-900 mt-4">
-                  <span className="text-base font-bold font-mono text-white">${jersey.price}</span>
+                  <span className="text-base font-bold font-mono text-white">₹{jersey.price}</span>
                   <Link 
                     to={`/product/${jersey.id}`}
                     className="bg-white text-black font-bold text-xs uppercase tracking-widest px-4 py-2.5 hover:bg-zinc-200 transition-colors"
@@ -208,24 +208,31 @@ export default function Home() {
               <span className="font-bold text-white uppercase tracking-widest">KnitCult</span>
             </div>
             <p className="text-zinc-500 leading-relaxed">
-              The premier destination for vintage match-worn aesthetics and collector-grade soccer jerseys.
+              India's home for vintage match-worn aesthetics and collector-grade soccer jerseys. Curated from Kolkata, delivered pan-India.
             </p>
+            <div className="flex flex-wrap gap-2 pt-2 text-[10px] font-mono uppercase tracking-widest text-zinc-500">
+              <span className="border border-zinc-800 px-2 py-1">🇮🇳 Made in India</span>
+              <span className="border border-zinc-800 px-2 py-1">INR ₹</span>
+              <span className="border border-zinc-800 px-2 py-1">Cash on Delivery Soon</span>
+            </div>
           </div>
           <div className="space-y-2">
             <h4 className="text-white font-bold uppercase tracking-widest">Archive Links</h4>
             <Link to="/catalog" className="block hover:text-white">Full Catalog</Link>
             <Link to="/catalog?filter=trending" className="block hover:text-white">Trending Editions</Link>
             <Link to="/orders" className="block hover:text-white">Order Tracking</Link>
+            <Link to="/wishlist" className="block hover:text-white">Wishlist</Link>
           </div>
           <div className="space-y-2">
-            <h4 className="text-white font-bold uppercase tracking-widest">Customer Care</h4>
-            <p className="hover:text-white cursor-pointer">Authenticity Guarantee</p>
-            <p className="hover:text-white cursor-pointer">Global Express Shipping</p>
-            <p className="hover:text-white cursor-pointer">Returns & Exchanges</p>
+            <h4 className="text-white font-bold uppercase tracking-widest">Delivery & Care</h4>
+            <p className="hover:text-white cursor-pointer">Pan-India Express Shipping</p>
+            <p className="hover:text-white cursor-pointer">Free above ₹5000 · ₹199 flat below</p>
+            <p className="hover:text-white cursor-pointer">Authenticity Guaranteed</p>
+            <p className="hover:text-white cursor-pointer">7-Day No-Question Returns</p>
           </div>
           <div className="space-y-2">
             <h4 className="text-white font-bold uppercase tracking-widest">Newsletter</h4>
-            <p className="text-zinc-500">Get early access to limited retro drops.</p>
+            <p className="text-zinc-500">Get first dibs on limited retro drops and India-only club editions.</p>
             <div className="flex gap-2 pt-2">
               <input 
                 type="email" 
@@ -235,6 +242,7 @@ export default function Home() {
               />
               <button className="bg-white text-black px-4 py-2 font-bold uppercase text-[10px]" data-testid="newsletter-submit">Join</button>
             </div>
+            <p className="text-[10px] font-mono text-zinc-600 pt-1">📞 <span className="text-zinc-400">Support:</span> support.knitcult@gmail.com</p>
           </div>
         </div>
 

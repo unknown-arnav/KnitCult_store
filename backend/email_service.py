@@ -64,7 +64,7 @@ def order_customer_html(order) -> str:
         f"<tr>"
         f"<td style='padding:10px 0;color:#e5e5e5;font-size:13px;'>{item.product_name}<br>"
         f"<span style='color:#71717a;font-size:11px;font-family:monospace;'>SIZE {item.size} × {item.qty}</span></td>"
-        f"<td style='padding:10px 0;color:#ffffff;text-align:right;font-family:monospace;font-size:13px;'>${item.price_at_purchase * item.qty:.2f}</td>"
+        f"<td style='padding:10px 0;color:#ffffff;text-align:right;font-family:monospace;font-size:13px;'>₹{item.price_at_purchase * item.qty:,.2f}</td>"
         f"</tr>"
         for item in order.items
     ])
@@ -78,11 +78,11 @@ def order_customer_html(order) -> str:
       <tr><td colspan="2" style="border-top:1px solid #222222;padding-top:14px;">
         <table width="100%"><tr>
           <td style="color:#a1a1aa;font-size:12px;text-transform:uppercase;letter-spacing:1px;">Subtotal</td>
-          <td style="text-align:right;color:#a1a1aa;font-family:monospace;font-size:13px;">${order.subtotal:.2f}</td>
-        </tr>{'<tr><td style="color:#a1a1aa;font-size:12px;text-transform:uppercase;letter-spacing:1px;padding-top:6px;">Discount</td><td style="text-align:right;color:#a1a1aa;font-family:monospace;font-size:13px;padding-top:6px;">-$' + f'{order.discount:.2f}' + '</td></tr>' if order.discount > 0 else ''}
+          <td style="text-align:right;color:#a1a1aa;font-family:monospace;font-size:13px;">₹{order.subtotal:,.2f}</td>
+        </tr>{'<tr><td style="color:#a1a1aa;font-size:12px;text-transform:uppercase;letter-spacing:1px;padding-top:6px;">Discount</td><td style="text-align:right;color:#a1a1aa;font-family:monospace;font-size:13px;padding-top:6px;">-₹' + f'{order.discount:,.2f}' + '</td></tr>' if order.discount > 0 else ''}
         <tr>
           <td style="color:#ffffff;font-weight:bold;font-size:14px;padding-top:10px;text-transform:uppercase;letter-spacing:1px;">Total</td>
-          <td style="text-align:right;color:#ffffff;font-family:monospace;font-weight:bold;font-size:16px;padding-top:10px;">${order.total:.2f}</td>
+          <td style="text-align:right;color:#ffffff;font-family:monospace;font-weight:bold;font-size:16px;padding-top:10px;">₹{order.total:,.2f}</td>
         </tr></table>
       </td></tr>
     </table>
@@ -97,7 +97,7 @@ def order_customer_html(order) -> str:
 def order_owner_html(order, user_email: str) -> str:
     rows = "".join([
         f"<tr><td style='padding:6px 0;color:#111;font-size:13px;'>{i.product_name} × {i.qty} (Size {i.size})</td>"
-        f"<td style='padding:6px 0;text-align:right;color:#111;font-family:monospace;'>${i.price_at_purchase * i.qty:.2f}</td></tr>"
+        f"<td style='padding:6px 0;text-align:right;color:#111;font-family:monospace;'>₹{i.price_at_purchase * i.qty:,.2f}</td></tr>"
         for i in order.items
     ])
     addr = order.shipping_address or {}
@@ -109,9 +109,9 @@ def order_owner_html(order, user_email: str) -> str:
       <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
         {rows}
         <tr><td colspan="2" style="border-top:1px solid #ddd;padding-top:8px;font-weight:bold;">Total</td></tr>
-        <tr><td>Subtotal</td><td style="text-align:right;font-family:monospace;">${order.subtotal:.2f}</td></tr>
-        <tr><td>Discount</td><td style="text-align:right;font-family:monospace;">-${order.discount:.2f}</td></tr>
-        <tr><td><strong>Total charged</strong></td><td style="text-align:right;font-family:monospace;"><strong>${order.total:.2f}</strong></td></tr>
+        <tr><td>Subtotal</td><td style="text-align:right;font-family:monospace;">₹{order.subtotal:,.2f}</td></tr>
+        <tr><td>Discount</td><td style="text-align:right;font-family:monospace;">-₹{order.discount:,.2f}</td></tr>
+        <tr><td><strong>Total charged</strong></td><td style="text-align:right;font-family:monospace;"><strong>₹{order.total:,.2f}</strong></td></tr>
       </table>
       <h3 style="margin:20px 0 6px;">Ship to</h3>
       <div style="color:#333;font-size:13px;line-height:1.5;">

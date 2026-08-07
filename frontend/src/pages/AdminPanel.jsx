@@ -222,7 +222,7 @@ function DashboardTab() {
                   <td className="p-3 text-white">{o.tracking_id}</td>
                   <td className="p-3 text-zinc-300">{o.status}</td>
                   <td className="p-3 text-zinc-300">{o.payment_status}</td>
-                  <td className="p-3 text-right text-white">${o.total.toFixed(2)}</td>
+                  <td className="p-3 text-right text-white">₹{o.total.toFixed(2)}</td>
                   <td className="p-3 text-zinc-400">{new Date(o.created_at).toLocaleDateString()}</td>
                 </tr>
               ))}
@@ -319,7 +319,7 @@ function ProductsTab() {
                     <span className="text-white">{p.name}</span>
                   </td>
                   <td className="p-3 text-zinc-300">{p.club}</td>
-                  <td className="p-3 text-right text-white">${p.price.toFixed(2)}</td>
+                  <td className="p-3 text-right text-white">₹{p.price.toFixed(2)}</td>
                   <td className="p-3 text-center">{p.is_trending ? "★" : ""}</td>
                   <td className="p-3 text-center">{p.is_active ? "✓" : "✗"}</td>
                   <td className="p-3 text-right space-x-2">
@@ -377,7 +377,7 @@ function ProductForm({ initial, onSave, onCancel }) {
       <form onSubmit={submit} className="space-y-5">
         <div className="grid grid-cols-2 gap-4 text-xs font-mono">
           <Field label="Name" value={f.name} onChange={(v) => setF({ ...f, name: v })} required />
-          <Field label="Price (USD)" type="number" value={f.price} onChange={(v) => setF({ ...f, price: v })} required />
+          <Field label="Price (INR)" type="number" value={f.price} onChange={(v) => setF({ ...f, price: v })} required />
           <Field label="Club" value={f.club} onChange={(v) => setF({ ...f, club: v })} />
           <Field label="League" value={f.league} onChange={(v) => setF({ ...f, league: v })} />
           <Field label="Era (e.g. 2000s)" value={f.era} onChange={(v) => setF({ ...f, era: v })} />
@@ -588,7 +588,7 @@ function CouponsTab() {
                       </div>
                     </td>
                     <td className="p-3 text-zinc-300">
-                      {c.discount_type === "percent" ? `${c.discount_value}%` : `$${c.discount_value}`}
+                      {c.discount_type === "percent" ? `${c.discount_value}%` : `₹${c.discount_value}`}
                       {c.min_order_value > 0 && <span className="text-zinc-500"> (min ${c.min_order_value})</span>}
                     </td>
                     <td className="p-3 text-zinc-300">
@@ -691,7 +691,7 @@ function CouponForm({ initial, onSave, onCancel }) {
             <label className="text-[10px] font-mono uppercase tracking-widest text-zinc-400">Discount Type</label>
             <select value={f.discount_type} onChange={(e) => setF({ ...f, discount_type: e.target.value })} className="w-full bg-zinc-900 border border-zinc-700 px-3 py-2 text-xs text-white font-mono">
               <option value="percent">Percent (%)</option>
-              <option value="flat">Flat ($)</option>
+              <option value="flat">Flat (₹)</option>
             </select>
           </div>
           <Field label="Discount Value" type="number" value={f.discount_value} onChange={(v) => setF({ ...f, discount_value: v })} required />
@@ -715,7 +715,7 @@ function CouponForm({ initial, onSave, onCancel }) {
           )}
         </div>
 
-        <Field label="Minimum Order Value ($)" type="number" value={f.min_order_value} onChange={(v) => setF({ ...f, min_order_value: v })} />
+        <Field label="Minimum Order Value (₹)" type="number" value={f.min_order_value} onChange={(v) => setF({ ...f, min_order_value: v })} />
 
         <label className="flex items-center gap-2 text-xs font-mono text-zinc-300"><input type="checkbox" checked={f.is_active} onChange={(e) => setF({ ...f, is_active: e.target.checked })} /> Active</label>
 
@@ -771,7 +771,7 @@ function OrdersTab() {
             <tr key={o.id} className="border-b border-zinc-900" data-testid={`admin-order-row-${o.id}`}>
               <td className="p-3 text-white">{o.tracking_id}</td>
               <td className="p-3 text-zinc-300">{o.phone}</td>
-              <td className="p-3 text-right text-white">${o.total.toFixed(2)}</td>
+              <td className="p-3 text-right text-white">₹{o.total.toFixed(2)}</td>
               <td className="p-3 text-zinc-300">{o.payment_status}</td>
               <td className="p-3">
                 <select value={o.status} onChange={(e) => updateStatus(o.id, e.target.value)} className="bg-zinc-900 border border-zinc-700 px-2 py-1 text-xs text-white font-mono" data-testid={`admin-order-status-${o.id}`}>

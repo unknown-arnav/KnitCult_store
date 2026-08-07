@@ -80,7 +80,7 @@ export default function Wishlist() {
                 </div>
 
                 <div className="p-5 pt-0 flex items-center justify-between border-t border-zinc-900 mt-4">
-                  <span className="text-base font-bold font-mono text-white">${jersey.price}</span>
+                  <span className="text-base font-bold font-mono text-white">₹{jersey.price}</span>
                   <Link 
                     to={`/product/${jersey.id}`}
                     className="bg-white text-black font-bold text-xs uppercase tracking-widest px-4 py-2.5 hover:bg-zinc-200 transition-colors flex items-center gap-1.5"

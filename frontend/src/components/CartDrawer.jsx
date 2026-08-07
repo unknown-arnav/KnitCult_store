@@ -7,7 +7,7 @@ export default function CartDrawer() {
   const { cart, removeFromCart, updateQuantity, isCartOpen, setIsCartOpen } = useStore();
 
   const subtotal = cart.reduce((sum, item) => sum + item.jersey.price * item.quantity, 0);
-  const shipping = subtotal > 150 ? 0 : 15;
+  const shipping = subtotal > 5000 ? 0 : 199;
   const total = subtotal + (cart.length > 0 ? shipping : 0);
 
   if (!isCartOpen) return null;
@@ -84,7 +84,7 @@ export default function CartDrawer() {
                         </button>
                       </div>
 
-                      <span className="text-sm font-bold font-mono text-white">${item.jersey.price * item.quantity}</span>
+                      <span className="text-sm font-bold font-mono text-white">₹{item.jersey.price * item.quantity}</span>
 
                       <button 
                         onClick={() => removeFromCart(index)}
@@ -106,15 +106,15 @@ export default function CartDrawer() {
               <div className="space-y-2 text-xs font-mono text-zinc-400">
                 <div className="flex justify-between">
                   <span>Subtotal</span>
-                  <span className="text-white">${subtotal}</span>
+                  <span className="text-white">₹{subtotal}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span>Estimated Shipping {subtotal > 150 ? '(Free over $150)' : ''}</span>
-                  <span className="text-white">{shipping === 0 ? 'FREE' : `$${shipping}`}</span>
+                  <span>Estimated Shipping {subtotal > 5000 ? '(Free over ₹5000)' : ''}</span>
+                  <span className="text-white">{shipping === 0 ? 'FREE' : `₹${shipping}`}</span>
                 </div>
                 <div className="flex justify-between text-sm font-bold text-white pt-2 border-t border-zinc-800">
                   <span>Total</span>
-                  <span className="font-mono text-base">${total}</span>
+                  <span className="font-mono text-base">₹{total}</span>
                 </div>
               </div>
 
